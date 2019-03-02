@@ -64,17 +64,12 @@ if __name__ == "__main__":
     seed_cost_dict = iniG.constructSeedCostDict()
     graph_dict = iniG.constructGraphDict()
     product_list = iniP.getProductList()
-    wallet_list = iniW.getWalletList(product_name)
     num_node = len(seed_cost_dict)
     num_product = len(product_list)
 
     # -- initialization for each budget --
     start_time = time.time()
-
     ssr = SeedSelectionR(graph_dict, seed_cost_dict, product_list, total_budget)
-    eva = Evaluation(graph_dict, seed_cost_dict, product_list, pp_strategy, whether_passing_information_without_purchasing)
-
-    personal_prob_list = eva.setPersonalProbList(wallet_list)
 
     ### result: (list) [profit, budget, seed number per product, customer number per product, seed set] in this execution_time
     result = []
@@ -94,7 +89,7 @@ if __name__ == "__main__":
     mep_k_prod, mep_i_node = mep_g[0], mep_g[1]
 
     # -- main --
-    while now_budget < total_budget and mep_i_node != '-1':
+    while now_budget <= total_budget and mep_i_node != '-1':
         seed_set[mep_k_prod].add(mep_i_node)
 
         budget_k_list[mep_k_prod] += seed_cost_dict[mep_i_node]
@@ -103,6 +98,10 @@ if __name__ == "__main__":
         nban_set = ssr.updateNotbanSet(nban_set, now_budget)
         mep_g = ssr.selectRandomSeed(nban_set)
         mep_k_prod, mep_i_node = mep_g[0], mep_g[1]
+
+    eva = Evaluation(graph_dict, seed_cost_dict, product_list, pp_strategy, whether_passing_information_without_purchasing)
+    wallet_list = iniW.getWalletList(product_name)
+    personal_prob_list = eva.setPersonalProbList(wallet_list)
 
     pro_acc, pro_k_list_acc, pnn_k_list_acc = 0.0, [0.0 for _ in range(num_product)], [0 for _ in range(num_product)]
     for _ in range(eva_monte_carlo):
