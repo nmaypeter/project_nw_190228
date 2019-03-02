@@ -2,18 +2,19 @@ from SeedSelection_NaiveGreedy import *
 
 if __name__ == "__main__":
     monte_carlo, eva_monte_carlo = 10, 100
-    num_pps = 3
-    for data_setting in [1, 2, 3]:
-        data_set_name = "email_undirected" * (data_setting == 1) + "dnc_email_directed" * (data_setting == 2) + \
-                        "email_Eu_core_directed" * (data_setting == 3) + "WikiVote_directed" * (data_setting == 4) + \
-                        "NetPHY_undirected" * (data_setting == 5)
-        for wpiwp in [bool(0), bool(1)]:
-            for prod_setting in [1, 2]:
-                for prod_setting2 in [1, 2, 3]:
+    data_setting_seq = [1, 2, 3]
+    wpiwp_seq = [bool(0), bool(1)]
+    prod_setting_seq, prod_setting2_seq = [1, 2], [1, 2, 3]
+    pps_seq = [1, 2, 3]
+    begin_budget, total_budget = 1, 10
+    sample_number = 10
+    for data_setting in data_setting_seq:
+        data_set_name = "email_undirected" * (data_setting == 1) + "dnc_email_directed" * (data_setting == 2) + "email_Eu_core_directed" * (data_setting == 3) + \
+                        "WikiVote_directed" * (data_setting == 4) + "NetPHY_undirected" * (data_setting == 5)
+        for wpiwp in wpiwp_seq:
+            for prod_setting in prod_setting_seq:
+                for prod_setting2 in prod_setting2_seq:
                     product_name = "r1p3n" + str(prod_setting) + "a" * (prod_setting2 == 2) + "b" * (prod_setting2 == 3)
-
-                    total_budget = 10
-                    sample_number, sample_output_number = 10, 10
 
                     iniG = IniGraph(data_set_name)
                     iniW = IniWallet(data_set_name)
@@ -25,19 +26,15 @@ if __name__ == "__main__":
                     num_node = len(seed_cost_dict)
                     num_product = len(product_list)
 
-                    for bud in range(1, total_budget + 1):
+                    for bud in range(begin_budget, total_budget + 1):
                         start_time = time.time()
                         ssng_main = SeedSelectionNG(graph_dict, seed_cost_dict, product_list, bud, monte_carlo)
                         diff_main = Diffusion(graph_dict, seed_cost_dict, product_list, bud, monte_carlo)
-
-                        result = [[] for _ in range(num_pps)]
-                        avg_profit, avg_budget = [0.0 for _ in range(num_pps)], [0.0 for _ in range(num_pps)]
-                        avg_num_k_seed, avg_num_k_pn = [0 for _ in range(num_product)], [0 for _ in range(num_product)]
-                        profit_k_list, budget_k_list = [0.0 for _ in range(num_product)], [0.0 for _ in range(num_product)]
+                        seed_set_sequence = []
 
                         for sample_count in range(sample_number):
-                            print("data_set_name = " + data_set_name + ", wpiwp = " + str(wpiwp) + ", product_name = " + product_name +
-                                  ", budget = " + str(bud) + ", sample_count = " + str(sample_count))
+                            print("@ mngic seed selection @ data_set_name = " + data_set_name + ", wpiwp = " + str(wpiwp) +
+                                  ", product_name = " + product_name + ", budget = " + str(bud) + ", sample_count = " + str(sample_count))
                             now_budget = 0.0
                             seed_set = [set() for _ in range(num_product)]
 
@@ -54,8 +51,6 @@ if __name__ == "__main__":
                                 seed_set_length = sum(len(seed_set[kk]) for kk in range(num_product))
                                 if mep_flag == seed_set_length:
                                     seed_set[mep_k_prod].add(mep_i_node)
-
-                                    budget_k_list[mep_k_prod] += seed_cost_dict[mep_i_node]
                                     now_budget += seed_cost_dict[mep_i_node]
                                 else:
                                     ep_g = 0.0
@@ -83,70 +78,93 @@ if __name__ == "__main__":
                                 mep_g = celf_sequence.pop(0)
                                 mep_k_prod, mep_i_node, mep_mg, mep_flag = mep_g[0], mep_g[1], mep_g[2], mep_g[3]
 
-                            how_long = round(time.time() - start_time, 2)
-                            for pps in [1, 2, 3]:
-                                # -- sample result --
-                                eva_main = Evaluation(graph_dict, seed_cost_dict, product_list, pps, wpiwp)
-                                wallet_list = iniW.getWalletList(product_name)
-                                personal_prob_list = eva_main.setPersonalProbList(wallet_list)
+                            seed_set_sequence.append(seed_set)
+                        ss_time = round(time.time() - start_time, 2)
 
-                                pro_acc, pro_k_list_acc, pnn_k_list_acc = 0.0, [0.0 for _ in range(num_product)], [0 for _ in range(num_product)]
+                        result = [[] for _ in range(len(pps_seq))]
+                        for pps in pps_seq:
+                            pps_start_time = time.time()
+                            avg_pro, avg_bud = 0.0, 0.0
+                            avg_sn_k, avg_pnn_k = [0 for _ in range(num_product)], [0 for _ in range(num_product)]
+                            avg_pro_k, avg_bud_k = [0.0 for _ in range(num_product)], [0.0 for _ in range(num_product)]
+
+                            eva_main = Evaluation(graph_dict, seed_cost_dict, product_list, pps, wpiwp)
+                            wallet_list = iniW.getWalletList(product_name)
+                            personal_prob_list = eva_main.setPersonalProbList(wallet_list)
+
+                            for sample_count, sample_seed_set in enumerate(seed_set_sequence):
+                                print("@ mngic evaluation @ data_set_name = " + data_set_name + ", wpiwp = " + str(wpiwp) +
+                                      ", product_name = " + product_name + ", budget = " + str(bud) + ", pps = " + str(pps) + ", sample_count = " + str(sample_count))
+                                sample_pro_acc, sample_bud_acc = 0.0, 0.0
+                                sample_sn_k_acc, sample_pnn_k_acc = [0.0 for _ in range(num_product)], [0 for _ in range(num_product)]
+                                sample_pro_k_acc, sample_bud_k_acc = [0.0 for _ in range(num_product)], [0.0 for _ in range(num_product)]
+
                                 for _ in range(eva_monte_carlo):
-                                    pro, pro_k_list, pnn_k_list = eva_main.getSeedSetProfit(seed_set, copy.deepcopy(wallet_list), copy.deepcopy(personal_prob_list))
-                                    pro_acc += pro
+                                    pro, pro_k_list, pnn_k_list = eva_main.getSeedSetProfit(sample_seed_set, copy.deepcopy(wallet_list), copy.deepcopy(personal_prob_list))
+                                    sample_pro_acc += pro
                                     for kk in range(num_product):
-                                        pro_k_list_acc[kk] += pro_k_list[kk]
-                                        pnn_k_list_acc[kk] += pnn_k_list[kk]
-                                now_profit = round(pro_acc / eva_monte_carlo, 4)
+                                        sample_pro_k_acc[kk] += pro_k_list[kk]
+                                        sample_pnn_k_acc[kk] += pnn_k_list[kk]
+                                sample_pro_acc = round(sample_pro_acc / eva_monte_carlo, 4)
                                 for kk in range(num_product):
-                                    profit_k_list[kk] += round(pro_k_list_acc[kk] / eva_monte_carlo, 4)
-                                    pnn_k_list_acc[kk] = round(pnn_k_list_acc[kk] / eva_monte_carlo, 2)
-                                now_budget = round(now_budget, 2)
+                                    sample_pro_k_acc[kk] = round(sample_pro_k_acc[kk] / eva_monte_carlo, 4)
+                                    sample_pnn_k_acc[kk] = round(sample_pnn_k_acc[kk] / eva_monte_carlo, 2)
+                                    sample_sn_k_acc[kk] = len(sample_seed_set[kk])
+                                    for sample_seed in sample_seed_set[kk]:
+                                        sample_bud_acc += seed_cost_dict[sample_seed]
+                                        sample_bud_k_acc[kk] += seed_cost_dict[sample_seed]
 
-                                # -- result --
-                                now_num_k_seed = [len(kk) for kk in seed_set]
-                                result[pps - 1].append([pro_acc, now_budget, now_num_k_seed, pnn_k_list_acc, seed_set])
-                                avg_profit[pps - 1] += now_profit
-                                avg_budget[pps - 1] += now_budget
+                                result[pps - 1].append([sample_pro_acc, sample_bud_acc, sample_sn_k_acc, sample_pnn_k_acc, sample_seed_set])
+                                avg_pro += sample_pro_acc
+                                avg_bud += sample_bud_acc
                                 for kk in range(num_product):
-                                    budget_k_list[kk] = round(budget_k_list[kk], 2)
-                                    avg_num_k_seed[kk] += now_num_k_seed[kk]
-                                    avg_num_k_pn[kk] += pnn_k_list_acc[kk]
+                                    avg_sn_k[kk] += sample_sn_k_acc[kk]
+                                    avg_pnn_k[kk] += sample_pnn_k_acc[kk]
+                                    avg_pro_k[kk] += sample_pro_k_acc[kk]
+                                    avg_bud_k[kk] += sample_bud_k_acc[kk]
 
-                                # -- result --
-                                print("total_time: " + str(how_long) + "sec")
+                                print("total_time: " + str(round(time.time() - start_time, 2)) + "sec")
                                 print(result[pps - 1][sample_count])
-                                print("avg_profit = " + str(round(avg_profit[pps - 1] / (sample_count + 1), 4)) + ", avg_budget = " + str(round(avg_budget[pps - 1] / (sample_count + 1), 4)))
+                                print("avg_profit = " + str(round(avg_pro / (sample_count + 1), 4)) + ", avg_budget = " + str(round(avg_bud / (sample_count + 1), 4)))
                                 print("------------------------------------------")
 
-                                if (sample_count + 1) % sample_output_number == 0:
-                                    path1 = "result/mngic_pps" + str(pps) + "_wpiwp" * wpiwp
-                                    if not os.path.isdir(path1):
-                                        os.mkdir(path1)
-                                    path = "result/mngic_pps" + str(pps) + "_wpiwp" * wpiwp + "/" + data_set_name + "_" + product_name
-                                    if not os.path.isdir(path):
-                                        os.mkdir(path)
-                                    fw = open(path + "/" + "b" + str(bud) + "_i" + str(sample_count + 1) + ".txt", 'w')
-                                    fw.write("mngic, pp_strategy = " + str(pps) + ", total_budget = " + str(bud) + ", wpiwp = " + str(wpiwp) + "\n" +
-                                             "data_set_name = " + data_set_name + ", product_name = " + product_name + "\n" +
-                                             "total_budget = " + str(bud) + ", sample_count = " + str(sample_count + 1) + "\n" +
-                                             "avg_profit = " + str(round(avg_profit[pps - 1] / (sample_count + 1), 4)) +
-                                             ", avg_budget = " + str(round(avg_budget[pps - 1] / (sample_count + 1), 4)) + "\n" +
-                                             "total_time = " + str(how_long) + ", avg_time = " + str(round(how_long / (sample_count + 1), 4)) + "\n")
-                                    fw.write("\nprofit_ratio =")
-                                    for kk in range(num_product):
-                                        fw.write(" " + str(round(profit_k_list[kk] / (sample_count + 1), 4)))
-                                    fw.write("\nbudget_ratio =")
-                                    for kk in range(num_product):
-                                        fw.write(" " + str(round(budget_k_list[kk] / (sample_count + 1), 4)))
-                                    fw.write("\nseed_number =")
-                                    for kk in range(num_product):
-                                        fw.write(" " + str(round(avg_num_k_seed[kk] / (sample_count + 1), 4)))
-                                    fw.write("\ncustomer_number =")
-                                    for kk in range(num_product):
-                                        fw.write(" " + str(round(avg_num_k_pn[kk] / (sample_count + 1), 4)))
-                                    fw.write("\n")
+                            avg_pro = round(avg_pro / sample_number, 4)
+                            avg_bud = round(avg_bud / sample_number, 2)
+                            for kk in range(num_product):
+                                avg_sn_k[kk] = round(avg_sn_k[kk] / sample_number, 2)
+                                avg_pnn_k[kk] = round(avg_pnn_k[kk] / sample_number, 2)
+                                avg_pro_k[kk] = round(avg_pro_k[kk] / sample_number, 4)
+                                avg_bud_k[kk] = round(avg_bud_k[kk] / sample_number, 2)
 
-                                    for t, r in enumerate(result[pps - 1]):
-                                        fw.write("\n" + str(t) + " " + str(round(r[0], 4)) + " " + str(round(r[1], 4)) + " " + str(r[2]) + " " + str(r[3]) + " " + str(r[4]))
-                                    fw.close()
+                            pps_time = round(time.time() - pps_start_time, 2)
+                            total_time = round(ss_time + pps_time, 2)
+                            path1 = "result/mngic_pps" + str(pps) + "_wpiwp" * wpiwp
+                            if not os.path.isdir(path1):
+                                os.mkdir(path1)
+                            path = "result/mngic_pps" + str(pps) + "_wpiwp" * wpiwp + "/" + data_set_name + "_" + product_name
+                            if not os.path.isdir(path):
+                                os.mkdir(path)
+                            fw = open(path + "/" + "b" + str(bud) + "_i" + str(sample_number) + ".txt", 'w')
+                            fw.write("mngic, pp_strategy = " + str(pps) + ", total_budget = " + str(bud) + ", wpiwp = " + str(wpiwp) + "\n" +
+                                     "data_set_name = " + data_set_name + ", product_name = " + product_name + "\n" +
+                                     "total_budget = " + str(bud) + ", sample_count = " + str(sample_number) + "\n" +
+                                     "avg_profit = " + str(avg_pro) +
+                                     ", avg_budget = " + str(avg_bud) + "\n" +
+                                     "total_time = " + str(total_time) + ", avg_time = " + str(round(total_time / sample_number, 4)) + "\n")
+                            fw.write("\nprofit_ratio =")
+                            for kk in range(num_product):
+                                fw.write(" " + str(avg_pro_k[kk]))
+                            fw.write("\nbudget_ratio =")
+                            for kk in range(num_product):
+                                fw.write(" " + str(avg_bud_k[kk]))
+                            fw.write("\nseed_number =")
+                            for kk in range(num_product):
+                                fw.write(" " + str(avg_sn_k[kk]))
+                            fw.write("\ncustomer_number =")
+                            for kk in range(num_product):
+                                fw.write(" " + str(avg_pnn_k[kk]))
+                            fw.write("\n")
+
+                            for t, r in enumerate(result[pps - 1]):
+                                fw.write("\n" + str(t) + "\t" + str(round(r[0], 4)) + "\t" + str(round(r[1], 4)) + "\t" + str(r[2]) + "\t" + str(r[3]) + "\t" + str(r[4]))
+                            fw.close()
