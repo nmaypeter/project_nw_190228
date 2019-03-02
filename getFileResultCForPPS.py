@@ -1,10 +1,10 @@
-for data_setting in [2, 3]:
+for data_setting in [1]:
     data_set_name = "email_undirected" * (data_setting == 1) + "dnc_email_directed" * (data_setting == 2) + \
                     "email_Eu_core_directed" * (data_setting == 3) + "WikiVote_directed" * (data_setting == 4) + \
                     "NetPHY_undirected" * (data_setting == 5)
-    max_m = 6
+    max_m = 4
     for m in range(1, max_m + 1):
-        model_name = "mngic" * (m == 1) + "mhdic" * (m == 2) + "mric" * (m == 3) + "mhadic" * (m == 4) + "mpmisic" * (m == 5) + "mtoic" * (m == 6) + "_pps"
+        model_name = "mngic" * (m == 1) + "mhdic" * (m == 2) + "mric" * (m == 3) + "mpmisic" * (m == 4) + "_pps"
         profit = []
         for prod_setting in [1, 2]:
             for prod_setting2 in [1, 2, 3]:
