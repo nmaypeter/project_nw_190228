@@ -24,16 +24,20 @@ class SeedSelectionHD:
         with open(IniGraph(data_name).data_degree_path) as f:
             for line in f:
                 (i, deg) = line.split()
+                if deg == '0':
+                    continue
                 for k in range(self.num_product):
                     if deg in d_dict:
                         d_dict[deg].add((k, i))
                     else:
                         d_dict[deg] = {(k, i)}
+        f.close()
+
         return d_dict
 
     def getHighDegreeNode(self, d_dict, cur_bud):
         # -- get the node with highest degree --
-        mep = [0, '-1']
+        mep = [-1, '-1']
         max_degree = -1
         while mep[1] == '-1':
             while max_degree == -1:
@@ -66,7 +70,7 @@ class SeedSelectionHD:
 if __name__ == "__main__":
     data_set_name = "email_undirected"
     product_name = "r1p3n1"
-    total_budget = 10
+    total_budget = 1
     pp_strategy = 1
     whether_passing_information_without_purchasing = bool(0)
     eva_monte_carlo = 100
@@ -78,17 +82,12 @@ if __name__ == "__main__":
     seed_cost_dict = iniG.constructSeedCostDict()
     graph_dict = iniG.constructGraphDict()
     product_list = iniP.getProductList()
-    wallet_list = iniW.getWalletList(product_name)
     num_node = len(seed_cost_dict)
     num_product = len(product_list)
 
     # -- initialization for each budget --
     start_time = time.time()
-
     sshd = SeedSelectionHD(graph_dict, seed_cost_dict, product_list, total_budget)
-    eva = Evaluation(graph_dict, seed_cost_dict, product_list, pp_strategy, whether_passing_information_without_purchasing)
-
-    personal_prob_list = eva.setPersonalProbList(wallet_list)
 
     ### result: (list) [profit, budget, seed number per product, customer number per product, seed set] in this execution_time
     result = []
@@ -115,6 +114,10 @@ if __name__ == "__main__":
 
         mep_g, degree_dict = sshd.getHighDegreeNode(degree_dict, now_budget)
         mep_k_prod, mep_i_node = mep_g[0], mep_g[1]
+
+    eva = Evaluation(graph_dict, seed_cost_dict, product_list, pp_strategy, whether_passing_information_without_purchasing)
+    wallet_list = iniW.getWalletList(product_name)
+    personal_prob_list = eva.setPersonalProbList(wallet_list)
 
     pro_acc, pro_k_list_acc, pnn_k_list_acc = 0.0, [0.0 for _ in range(num_product)], [0 for _ in range(num_product)]
     for _ in range(eva_monte_carlo):
