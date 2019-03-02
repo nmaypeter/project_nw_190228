@@ -106,7 +106,7 @@ if __name__ == "__main__":
     mep_k_prod, mep_i_node = mep_g[0], mep_g[1]
 
     # -- main --
-    while now_budget < total_budget and mep_i_node != '-1':
+    while now_budget <= total_budget and mep_i_node != '-1':
         seed_set[mep_k_prod].add(mep_i_node)
 
         budget_k_list[mep_k_prod] += seed_cost_dict[mep_i_node]
