@@ -89,12 +89,6 @@ if __name__ == "__main__":
     start_time = time.time()
     sshd = SeedSelectionHD(graph_dict, seed_cost_dict, product_list, total_budget)
 
-    ### result: (list) [profit, budget, seed number per product, customer number per product, seed set] in this execution_time
-    result = []
-    avg_profit, avg_budget = 0.0, 0.0
-    avg_num_k_seed, avg_num_k_pn = [0 for _ in range(num_product)], [0 for _ in range(num_product)]
-    profit_k_list, budget_k_list = [0.0 for _ in range(num_product)], [0.0 for _ in range(num_product)]
-
     # -- initialization for each sample_number --
     ### now_budget: (float) the budget in this execution_time
     now_budget = 0.0
@@ -108,8 +102,6 @@ if __name__ == "__main__":
     # -- main --
     while now_budget <= total_budget and mep_i_node != '-1':
         seed_set[mep_k_prod].add(mep_i_node)
-
-        budget_k_list[mep_k_prod] += seed_cost_dict[mep_i_node]
         now_budget += seed_cost_dict[mep_i_node]
 
         mep_g, degree_dict = sshd.getHighDegreeNode(degree_dict, now_budget)
@@ -119,31 +111,30 @@ if __name__ == "__main__":
     wallet_list = iniW.getWalletList(product_name)
     personal_prob_list = eva.setPersonalProbList(wallet_list)
 
-    pro_acc, pro_k_list_acc, pnn_k_list_acc = 0.0, [0.0 for _ in range(num_product)], [0 for _ in range(num_product)]
+    sample_pro_acc, sample_bud_acc = 0.0, 0.0
+    sample_sn_k_acc, sample_pnn_k_acc = [0.0 for _ in range(num_product)], [0 for _ in range(num_product)]
+    sample_pro_k_acc, sample_bud_k_acc = [0.0 for _ in range(num_product)], [0.0 for _ in range(num_product)]
+
     for _ in range(eva_monte_carlo):
         pro, pro_k_list, pnn_k_list = eva.getSeedSetProfit(seed_set, copy.deepcopy(wallet_list), copy.deepcopy(personal_prob_list))
-        pro_acc += pro
+        sample_pro_acc += pro
         for kk in range(num_product):
-            pro_k_list_acc[kk] += pro_k_list[kk]
-            pnn_k_list_acc[kk] += pnn_k_list[kk]
-    pro_acc = round(pro_acc / eva_monte_carlo, 4)
+            sample_pro_k_acc[kk] += pro_k_list[kk]
+            sample_pnn_k_acc[kk] += pnn_k_list[kk]
+    sample_pro_acc = round(sample_pro_acc / eva_monte_carlo, 4)
     for kk in range(num_product):
-        profit_k_list[kk] += round(pro_k_list_acc[kk] / eva_monte_carlo, 4)
-        pnn_k_list_acc[kk] = round(pnn_k_list_acc[kk] / eva_monte_carlo, 2)
-    now_budget = round(now_budget, 2)
+        sample_pro_k_acc[kk] = round(sample_pro_k_acc[kk] / eva_monte_carlo, 4)
+        sample_pnn_k_acc[kk] = round(sample_pnn_k_acc[kk] / eva_monte_carlo, 2)
+        sample_sn_k_acc[kk] = len(seed_set[kk])
+        for sample_seed in seed_set[kk]:
+            sample_bud_acc += seed_cost_dict[sample_seed]
+            sample_bud_k_acc[kk] += seed_cost_dict[sample_seed]
 
-    # -- result --
-    now_num_k_seed = [len(kk) for kk in seed_set]
-    result.append([pro_acc, now_budget, now_num_k_seed, pnn_k_list_acc, seed_set])
-    avg_profit += pro_acc
-    avg_budget += now_budget
-    for kk in range(num_product):
-        budget_k_list[kk] = round(budget_k_list[kk], 2)
-        avg_num_k_seed[kk] += now_num_k_seed[kk]
-        avg_num_k_pn[kk] += pnn_k_list_acc[kk]
-    how_long = round(time.time() - start_time, 2)
-    print("\nresult")
-    print(result)
-    print("\npro_k_list, budget_k_list")
-    print(profit_k_list, budget_k_list)
-    print("total time: " + str(how_long) + "sec")
+    print("seed set: " + str(seed_set))
+    print("profit: " + str(sample_pro_acc))
+    print("budget: " + str(sample_bud_acc))
+    print("seed number: " + str(sample_sn_k_acc))
+    print("purchasing node number: " + str(sample_pnn_k_acc))
+    print("ratio profit: " + str(sample_pro_k_acc))
+    print("ratio budget: " + str(sample_bud_k_acc))
+    print("total time: " + str(round(time.time() - start_time, 2)) + "sec")
