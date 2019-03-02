@@ -7,7 +7,7 @@ if __name__ == "__main__":
     prod_setting_seq, prod_setting2_seq = [1, 2], [1, 2, 3]
     pps_seq = [1, 2, 3]
     begin_budget, total_budget = 1, 10
-    sample_number = 10
+    sample_number = 20
     for data_setting in data_setting_seq:
         data_set_name = "email_undirected" * (data_setting == 1) + "dnc_email_directed" * (data_setting == 2) + "email_Eu_core_directed" * (data_setting == 3) + \
                         "WikiVote_directed" * (data_setting == 4) + "NetPHY_undirected" * (data_setting == 5)
@@ -84,6 +84,8 @@ if __name__ == "__main__":
                                     for sample_seed in sample_seed_set[kk]:
                                         sample_bud_acc += seed_cost_dict[sample_seed]
                                         sample_bud_k_acc[kk] += seed_cost_dict[sample_seed]
+                                        sample_bud_acc = round(sample_bud_acc, 2)
+                                        sample_bud_k_acc[kk] = round(sample_bud_k_acc[kk], 2)
 
                                 result[pps - 1].append([sample_pro_acc, sample_bud_acc, sample_sn_k_acc, sample_pnn_k_acc, sample_seed_set])
                                 avg_pro += sample_pro_acc
