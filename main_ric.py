@@ -114,14 +114,14 @@ if __name__ == "__main__":
 
                             pps_time = round(time.time() - pps_start_time, 2)
                             total_time = round(ss_time + pps_time, 2)
-                            path1 = "result/mhdic_pps" + str(pps) + "_wpiwp" * wpiwp
+                            path1 = "result/mric_pps" + str(pps) + "_wpiwp" * wpiwp
                             if not os.path.isdir(path1):
                                 os.mkdir(path1)
-                            path = "result/mhdic_pps" + str(pps) + "_wpiwp" * wpiwp + "/" + data_set_name + "_" + product_name
+                            path = "result/mric_pps" + str(pps) + "_wpiwp" * wpiwp + "/" + data_set_name + "_" + product_name
                             if not os.path.isdir(path):
                                 os.mkdir(path)
                             fw = open(path + "/" + "b" + str(bud) + "_i" + str(sample_number) + ".txt", 'w')
-                            fw.write("mhdic, pp_strategy = " + str(pps) + ", total_budget = " + str(bud) + ", wpiwp = " + str(wpiwp) + "\n" +
+                            fw.write("mric, pp_strategy = " + str(pps) + ", total_budget = " + str(bud) + ", wpiwp = " + str(wpiwp) + "\n" +
                                      "data_set_name = " + data_set_name + ", product_name = " + product_name + "\n" +
                                      "total_budget = " + str(bud) + ", sample_count = " + str(sample_number) + "\n" +
                                      "avg_profit = " + str(avg_pro) +
