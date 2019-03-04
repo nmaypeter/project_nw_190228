@@ -22,13 +22,17 @@ class SeedSelectionNGPW:
 
     def getProductWeight(self):
         prod_list = [pk[2] for pk in self.product_list]
+        ### ngpw1 ###
+        # x_range = [0, sum(prod_list)]
+        # mu = np.mean(x_range)
+        # sigma = mu / 3
+        # x_min, x_max = float(mu - 3 * sigma), float(mu + 3 * sigma)
+        # X = np.arange(x_min, x_max, 0.001)
+        # y = 1 - stats.norm.cdf(X, mu, 1)
+        ### ngpw2 ###
         x_range = [0, sum(prod_list)]
-        # x_range = [0, sum(prod_list) - np.mean(prod_list)]
-        mu = np.mean(x_range)
-        sigma = mu / 3
-        x_min, x_max = float(mu - 3 * sigma), float(mu + 3 * sigma)
-        X = np.arange(x_min, x_max, 0.001)
-        y = 1 - stats.norm.cdf(X, mu, 1)
+        X = np.arange(0, 5, 0.001)
+        y = 1 - stats.norm.cdf(X, 0, 1)
         pw_list = [round(float(y[np.argwhere(X == p)]) * 10, 4) for p in prod_list]
 
         return pw_list
