@@ -199,8 +199,6 @@ class DiffusionRR:
     def getExpectedProfit(self, k_prod, i_node, s_set):
         # -- calculate the expected profit for single node when i_node's chosen as a seed for k-product --
         ### ep: (float2) the expected profit
-        diff_d = DiffusionRR(self.graph_dict, self.seed_cost_dict, self.product_list, self.total_budget, self.monte)
-        rr_g_dict = diff_d.generateRRGraph()
         s_set_t = copy.deepcopy(s_set)
         s_set_t[k_prod].add(i_node)
         a_n_set = copy.deepcopy(s_set_t)
@@ -208,7 +206,7 @@ class DiffusionRR:
         ep = 0.0
 
         # -- notice: prevent the node from owing no receiver --
-        if i_node not in rr_g_dict:
+        if i_node not in self.graph_dict:
             return round(ep, 4)
 
         # -- insert the children of seeds into try_s_n_sequence --
@@ -224,10 +222,10 @@ class DiffusionRR:
             try_s_n_sequence.remove(seed)
             k_prod_t, i_node_t = seed[0], seed[1]
 
-            if i_node_t not in rr_g_dict:
+            if i_node_t not in self.graph_dict:
                 continue
 
-            out_dict = rr_g_dict[i_node_t]
+            out_dict = self.graph_dict[i_node_t]
             for out in out_dict:
                 if out in a_n_set[k_prod_t]:
                     continue
@@ -255,7 +253,7 @@ class DiffusionRR:
             if child_depth >= 3:
                 continue
 
-            out_dict = rr_g_dict[i_node_t]
+            out_dict = self.graph_dict[i_node_t]
             for out in out_dict:
                 if out in a_n_set[k_prod_t]:
                     continue
@@ -273,8 +271,6 @@ class DiffusionRR:
     def getSeedSetProfit(self, s_set):
         # -- calculate the expected profit for single node when i_node's chosen as a seed for k-product --
         ### ep: (float2) the expected profit
-        diff_d = DiffusionRR(self.graph_dict, self.seed_cost_dict, self.product_list, self.total_budget, self.monte)
-        rr_g_dict = diff_d.generateRRGraph()
         s_set_t = copy.deepcopy(s_set)
         a_n_set = copy.deepcopy(s_set_t)
         a_e_set = [{} for _ in range(self.num_product)]
@@ -293,10 +289,10 @@ class DiffusionRR:
             try_s_n_sequence.remove(seed)
             k_prod_t, i_node_t = seed[0], seed[1]
 
-            if i_node_t not in rr_g_dict:
+            if i_node_t not in self.graph_dict:
                 continue
 
-            out_dict = rr_g_dict[i_node_t]
+            out_dict = self.graph_dict[i_node_t]
             for out in out_dict:
                 if out in a_n_set[k_prod_t]:
                     continue
@@ -318,13 +314,13 @@ class DiffusionRR:
             ep += self.product_list[k_prod_t][0]
 
             # -- notice: prevent the node from owing no receiver --
-            if i_node_t not in rr_g_dict:
+            if i_node_t not in self.graph_dict:
                 continue
 
             if child_depth >= 3:
                 continue
 
-            out_dict = rr_g_dict[i_node_t]
+            out_dict = self.graph_dict[i_node_t]
             for out in out_dict:
                 if out in a_n_set[k_prod_t]:
                     continue
