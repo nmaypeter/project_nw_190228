@@ -2,11 +2,11 @@ from SeedSelection_NGPW import *
 
 if __name__ == "__main__":
     monte_carlo, eva_monte_carlo = 10, 100
-    data_setting_seq = [1]
+    data_setting_seq = [1, 2, 3]
     wpiwp_seq = [bool(0), bool(1)]
-    prod_setting_seq, prod_setting2_seq = [1], [1]
+    prod_setting_seq, prod_setting2_seq = [1, 2], [1, 2, 3]
     pps_seq = [1, 2, 3]
-    begin_budget, total_budget = 10, 10
+    begin_budget, total_budget = 1, 10
     sample_number = 20
     for data_setting in data_setting_seq:
         data_set_name = "email_undirected" * (data_setting == 1) + "dnc_email_directed" * (data_setting == 2) + "email_Eu_core_directed" * (data_setting == 3) + \
