@@ -27,7 +27,7 @@ for data_setting in [1, 2, 3]:
                             try:
                                 result_name = "result/" + model_name + str(pps) + "_wpiwp" * wpiwp + "/" + \
                                               data_set_name + "_" + product_name + "/" + \
-                                              "b" + str(bud) + "_i10.txt"
+                                              "b" + str(bud) + "_i20.txt"
                                 print(result_name)
 
                                 with open(result_name) as f:
