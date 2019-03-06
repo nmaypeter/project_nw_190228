@@ -53,7 +53,7 @@ class SeedSelectionNG:
 if __name__ == "__main__":
     data_set_name = "email_undirected"
     product_name = "r1p3n1"
-    total_budget = 10
+    bud = 10
     pp_strategy = 1
     whether_passing_information_without_purchasing = bool(0)
     monte_carlo, eva_monte_carlo = 10, 100
@@ -70,8 +70,8 @@ if __name__ == "__main__":
 
     # -- initialization for each budget --
     start_time = time.time()
-    ssng = SeedSelectionNG(graph_dict, seed_cost_dict, product_list, total_budget, monte_carlo)
-    diff = Diffusion(graph_dict, seed_cost_dict, product_list, total_budget, monte_carlo)
+    ssng = SeedSelectionNG(graph_dict, seed_cost_dict, product_list, bud, monte_carlo)
+    diff = Diffusion(graph_dict, seed_cost_dict, product_list, bud, monte_carlo)
 
     # -- initialization for each sample_number --
     ### now_budget: (float) the budget in this execution_time
@@ -83,8 +83,8 @@ if __name__ == "__main__":
     mep_g = celf_sequence.pop(0)
     mep_k_prod, mep_i_node, mep_mg, mep_flag = mep_g[0], mep_g[1], mep_g[2], mep_g[3]
 
-    while now_budget <= total_budget and mep_i_node != '-1':
-        if now_budget + seed_cost_dict[mep_i_node] > total_budget:
+    while now_budget <= bud and mep_i_node != '-1':
+        if now_budget + seed_cost_dict[mep_i_node] > bud:
             mep_g = celf_sequence.pop(0)
             mep_k_prod, mep_i_node, mep_mg, mep_flag = mep_g[0], mep_g[1], mep_g[2], mep_g[3]
             if mep_i_node != '-1':
