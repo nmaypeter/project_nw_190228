@@ -4,7 +4,8 @@ for data_setting in [1, 2, 3]:
                     "NetPHY_undirected" * (data_setting == 5)
     max_m = 4
     for m in range(1, max_m + 1):
-        model_name = "mngic" * (m == 1) + "mhdic" * (m == 2) + "mric" * (m == 3) + "mpmisic" * (m == 4) + "_pps"
+        # model_name = "mngic" * (m == 1) + "mhdic" * (m == 2) + "mric" * (m == 3) + "mpmisic" * (m == 4) + "_pps"
+        model_name = "mngic" * (m == 1) + "mngpwic" * (m == 2) + "mngpw2ic" * (m == 3) + "mngscsic" * (m == 4) + "_pps"
         profit = []
         for prod_setting in [1, 2]:
             for prod_setting2 in [1, 2, 3]:
@@ -28,7 +29,8 @@ for data_setting in [1, 2, 3]:
                             profit.append("")
                             continue
 
-        fw = open("result/r_" + data_set_name + "/" + model_name + "_comparison_profit.txt", 'w')
+        # fw = open("result/r_" + data_set_name + "/" + model_name + "_comparison_profit.txt", 'w')
+        fw = open("result/r_" + data_set_name + "/" + model_name + "_ng_comparison_profit.txt", 'w')
         for lnum, line in enumerate(profit):
             if lnum % 6 == 0 and lnum != 0:
                 fw.write("\n" * 9)
