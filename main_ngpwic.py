@@ -47,8 +47,8 @@ if __name__ == "__main__":
                             mep_g = celf_sequence[mep_celf[0]].pop(0)
                             mep_k_prod, mep_i_node, mep_mg_score, mep_flag = mep_g[0], mep_g[1], mep_g[2], mep_g[3]
 
-                            while now_budget <= total_budget and mep_i_node != '-1':
-                                if now_budget + seed_cost_dict[mep_i_node] > total_budget:
+                            while now_budget <= bud and mep_i_node != '-1':
+                                if now_budget + seed_cost_dict[mep_i_node] > bud:
                                     mep_celf = [-1, 0.0]
                                     for kk in range(num_product):
                                         if celf_sequence[kk][0][2] > mep_celf[1]:
