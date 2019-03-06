@@ -112,7 +112,7 @@ class SeedSelectionPMIS:
 if __name__ == "__main__":
     data_set_name = "email_undirected"
     product_name = "r1p3n1"
-    total_budget = 10
+    bud = 10
     pp_strategy = 1
     whether_passing_information_without_purchasing = bool(0)
     monte_carlo, eva_monte_carlo = 10, 100
@@ -129,8 +129,8 @@ if __name__ == "__main__":
 
     # -- initialization for each budget --
     start_time = time.time()
-    sspmis = SeedSelectionPMIS(graph_dict, seed_cost_dict, product_list, total_budget, monte_carlo)
-    diff = Diffusion(graph_dict, seed_cost_dict, product_list, total_budget, monte_carlo)
+    sspmis = SeedSelectionPMIS(graph_dict, seed_cost_dict, product_list, bud, monte_carlo)
+    diff = Diffusion(graph_dict, seed_cost_dict, product_list, bud, monte_carlo)
 
     # -- initialization for each sample_number --
     ### now_budget: (float) the budget in this execution_time
@@ -151,7 +151,7 @@ if __name__ == "__main__":
         for kk in range(num_product):
             bud_pmis += copy.deepcopy(c_matrix)[kk][bud_index[kk]]
 
-        if bud_pmis <= total_budget:
+        if bud_pmis <= bud:
             temp_bound_flag = 1
             for kk in range(num_product):
                 if temp_bound_index[kk] > bud_index[kk]:
