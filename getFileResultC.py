@@ -9,7 +9,8 @@ for data_setting in [1, 2, 3]:
             for wpiwp in [bool(0), bool(1)]:
                 max_m = 4
                 for m in range(1, max_m + 1):
-                    model_name = "mngic" * (m == 1) + "mhdic" * (m == 2) + "mric" * (m == 3) + "mpmisic" * (m == 4) + "_pps"
+                    # model_name = "mngic" * (m == 1) + "mhdic" * (m == 2) + "mric" * (m == 3) + "mpmisic" * (m == 4) + "_pps"
+                    model_name = "mngic" * (m == 1) + "mngpwic" * (m == 2) + "mngpw2ic" * (m == 3) + "mngscsic" * (m == 4) + "_pps"
                     for pps in [1, 2, 3]:
 
                         try:
@@ -28,7 +29,8 @@ for data_setting in [1, 2, 3]:
                             profit.append("")
                             continue
 
-    fw = open("result/r_" + data_set_name + "/comparison_profit.txt", 'w')
+    # fw = open("result/r_" + data_set_name + "/comparison_profit.txt", 'w')
+    fw = open("result/r_" + data_set_name + "/comparison_ng_profit.txt", 'w')
     for lnum, line in enumerate(profit):
         if lnum % (max_m * 3) == 0 and lnum != 0:
             fw.write("\n")
