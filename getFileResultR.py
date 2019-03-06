@@ -5,8 +5,9 @@ for data_setting in [1, 2, 3]:
                     "email_Eu_core_directed" * (data_setting == 3) + "WikiVote_directed" * (data_setting == 4) + \
                     "NetPHY_undirected" * (data_setting == 5)
     # model is optional
-    for m in [1, 2, 3, 4]:
-        model_name = "mngic" * (m == 1) + "mhdic" * (m == 2) + "mric" * (m == 3) + "mpmisic" * (m == 4) + "_pps"
+    for m in [1, 2, 3, 4, 5, 6, 7]:
+        model_name = "mngic" * (m == 1) + "mhdic" * (m == 2) + "mric" * (m == 3) + "mpmisic" * (m == 4) + \
+                     "mngpwic" * (m == 5) + "mngpw2ic" * (m == 6) + "mngscsic" * (m == 7) + "_pps"
         for pps in [1, 2, 3]:
             profit, cost, time_avg, time_total = [], [], [], []
             ratio_profit, ratio_cost, number_an, number_seed = [], [], [], []
