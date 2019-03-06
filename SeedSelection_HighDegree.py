@@ -70,7 +70,7 @@ class SeedSelectionHD:
 if __name__ == "__main__":
     data_set_name = "email_undirected"
     product_name = "r1p3n1"
-    total_budget = 1
+    bud = 1
     pp_strategy = 1
     whether_passing_information_without_purchasing = bool(0)
     eva_monte_carlo = 100
@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
     # -- initialization for each budget --
     start_time = time.time()
-    sshd = SeedSelectionHD(graph_dict, seed_cost_dict, product_list, total_budget)
+    sshd = SeedSelectionHD(graph_dict, seed_cost_dict, product_list, bud)
 
     # -- initialization for each sample_number --
     ### now_budget: (float) the budget in this execution_time
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     mep_k_prod, mep_i_node = mep_g[0], mep_g[1]
 
     # -- main --
-    while now_budget <= total_budget and mep_i_node != '-1':
+    while now_budget <= bud and mep_i_node != '-1':
         seed_set[mep_k_prod].add(mep_i_node)
         now_budget += seed_cost_dict[mep_i_node]
 
